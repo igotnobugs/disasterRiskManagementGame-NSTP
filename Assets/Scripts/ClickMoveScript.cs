@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ClickMoveScript : MonoBehaviour {
 
     public bool isSelected;
     public Vector3 moveToPosition;
-    public GameObject gameObject;
+    public GameObject box;
+    public Canvas ui;
 
     // Use this for initialization
     void Start () {
@@ -17,21 +19,36 @@ public class ClickMoveScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (isSelected) {
 
-            if (Input.GetMouseButtonDown(0)) {
-                moveToPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                moveToPosition.y = this.gameObject.transform.position.y;
-            }
-
-            this.gameObject.transform.position = moveToPosition;
-            
+        if (Input.GetKey(KeyCode.A)) {
+            this.gameObject.transform.Translate(new Vector3(-5 * Time.deltaTime, 0, 0));
         }
-        Debug.Log(this.gameObject.transform.position + " " + moveToPosition);
+        if (Input.GetKey(KeyCode.W))
+        {
+            this.gameObject.transform.Translate(new Vector3(0, 0, 5 * Time.deltaTime));
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            this.gameObject.transform.Translate(new Vector3(0, 0, -5 * Time.deltaTime));
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            this.gameObject.transform.Translate(new Vector3(5 * Time.deltaTime, 0, 0));
+        }
+
     }
 
-    //object is clicked
-    void OnMouseDown() {
-        isSelected = true;
+
+
+    private void OnCollisionEnter(Collision col)
+    {
+        if (col.gameObject.name == "Table (1)")
+        {
+            Destroy(col.gameObject);
+        }
+        if (col.gameObject.name == "door")
+        {
+            //GameOver
+        }
     }
 }
