@@ -1,14 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ClickMoveScript : MonoBehaviour {
 
     public bool isSelected;
     public Vector3 moveToPosition;
     public GameObject box;
-    public Canvas ui;
 
     // Use this for initialization
     void Start () {
@@ -45,10 +43,6 @@ public class ClickMoveScript : MonoBehaviour {
         if (col.gameObject.name == "Table (1)")
         {
             Destroy(col.gameObject);
-        }
-        if (col.gameObject.name == "door")
-        {
-            //GameOver
         }
     }
 }
