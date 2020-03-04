@@ -9,6 +9,7 @@ TagManager:
   - thirdChoice
   - gameUI
   - timerText
+  - scoreText
   layers:
   - Default
   - TransparentFX

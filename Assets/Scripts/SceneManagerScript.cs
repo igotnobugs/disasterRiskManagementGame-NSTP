@@ -30,6 +30,10 @@ public class SceneManagerScript : MonoBehaviour {
     private float timerCount; 
     private Vector3 midPoint = new Vector3();
 
+    private bool choiceIsPicked = false;
+    private float score = 0;
+    private Text scoreText;
+    public bool scored = false;
 
     // Start is called before the first frame update
     void Start() {
@@ -47,15 +51,22 @@ public class SceneManagerScript : MonoBehaviour {
         timer = GameObject.FindGameObjectWithTag("timerText").GetComponent<Text>();
         timerCount = startTimerValue;
         timer.text = timerCount.ToString("f2");
+
+        scoreText = GameObject.FindGameObjectWithTag("scoreText").GetComponent<Text>();
     }
 
     // Update is called once per frame
     void Update() {
         //Timer CountDown
-        timerCount -= 1 * Time.deltaTime;
+        if (!choiceIsPicked) timerCount -= 1 * Time.deltaTime;
+        else {
+            if (!scored) {
+                score += Mathf.Round(timerCount * 10);
+                scored = true;
+            }
+        }
+        scoreText.text = score.ToString();
         timer.text = timerCount.ToString("f2");
-
-
 
         if (firstObject != null) {
             //Get midpoint of the two objects, send it to Camera as target
@@ -67,11 +78,13 @@ public class SceneManagerScript : MonoBehaviour {
             character.GetComponent<CharacterControlScript>().target = secondObject.transform.position;
             character.GetComponent<CharacterControlScript>().faceTowardsTarget = true;
         }
-
     }
 
 
     public void buttonHovered(string tagName) {
+
+        if (choiceIsPicked) return;
+
         if (tagName == "firstChoice") {
             mCamera.GetComponent<CameraControlScript>().newTarget();
             firstObject = character;
@@ -92,6 +105,18 @@ public class SceneManagerScript : MonoBehaviour {
             secondObject = character;
             character.GetComponent<CharacterControlScript>().isLooking = false;
         }
+    }
+
+    public void buttonClicked(string tagName) {
+
+        if (choiceIsPicked) return;
+
+        if (tagName == "firstChoice") {
+            character.GetComponent<CharacterControlScript>().startMoving = true;
+        }
+
+        choiceIsPicked = true;
+        
     }
 
     void OnDrawGizmos() {
