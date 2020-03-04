@@ -18,8 +18,8 @@ public class CameraControlScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = new Vector3(Mathf.Lerp(transform.position.x, target.x, t)
-                , 10f
+        transform.position = new Vector3(Mathf.Lerp(transform.position.x, target.x + offset.x, t)
+                , offset.y
                 , Mathf.Lerp(transform.position.z, target.z + offset.z, t));
 
         t += 0.5f * Time.deltaTime;
