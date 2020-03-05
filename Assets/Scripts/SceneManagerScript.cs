@@ -5,17 +5,13 @@ using UnityEngine.UI;
 
 public class SceneManagerScript : MonoBehaviour {
 
-    public Camera mCamera;
+    public Camera mainCamera;
     public float startTimerValue;
     public Canvas UI;
 
-    public string firstChoiceText;
-    public string secondChoiceText;
-    public string thirdChoiceText;
+    public GameObject currentScene;
 
-    public GameObject character;
-    public GameObject table;
-    public GameObject door;
+    public GameObject mainCharacter;
 
     private Button firChoice;
     private Button secChoice;
@@ -35,6 +31,12 @@ public class SceneManagerScript : MonoBehaviour {
     private Text scoreText;
     public bool scored = false;
 
+    private SceneScript currentScript;
+
+    private bool sceneTransistionFinished = false;
+
+    private bool isTimerSet = false;
+
     // Start is called before the first frame update
     void Start() {
         UI = GameObject.FindGameObjectWithTag("gameUI").GetComponent<Canvas>();
@@ -43,79 +45,130 @@ public class SceneManagerScript : MonoBehaviour {
         secChoice = GameObject.FindGameObjectWithTag("secondChoice").GetComponent<Button>();
         thdChoice = GameObject.FindGameObjectWithTag("thirdChoice").GetComponent<Button>();
 
-        firChoice.GetComponentInChildren<Text>().text = firstChoiceText;
-        secChoice.GetComponentInChildren<Text>().text = secondChoiceText;
-        thdChoice.GetComponentInChildren<Text>().text = thirdChoiceText;
-
-
         timer = GameObject.FindGameObjectWithTag("timerText").GetComponent<Text>();
-        timerCount = startTimerValue;
-        timer.text = timerCount.ToString("f2");
+        //timerCount = startTimerValue;
+        //timer.text = timerCount.ToString("f2");
 
         scoreText = GameObject.FindGameObjectWithTag("scoreText").GetComponent<Text>();
+
+        //First scene to do, is the selected current Scene      
+        //GotToScene(currentScene);
     }
 
     // Update is called once per frame
     void Update() {
-        //Timer CountDown
-        if (!choiceIsPicked) timerCount -= 1 * Time.deltaTime;
-        else {
-            if (!scored) {
-                score += Mathf.Round(timerCount * 10);
-                scored = true;
+        //Timer Countdown
+        if (isTimerSet) {
+            if (!choiceIsPicked) timerCount -= 1 * Time.deltaTime;
+            else {
+                if (!scored) {
+                    score += Mathf.Round(timerCount * 10);
+                    scored = true;
+                }
             }
         }
+        //Scoring
         scoreText.text = score.ToString();
         timer.text = timerCount.ToString("f2");
 
-        if (firstObject != null) {
+        if (!sceneTransistionFinished) {
+            GotToScene(currentScene);
+            choiceIsPicked = false;
+        }
+        
+
+        if (currentScript.allowCameraMovement) {
             //Get midpoint of the two objects, send it to Camera as target
             midPoint.x = (firstObject.transform.position.x + secondObject.transform.position.x) / 2;
             midPoint.y = 0;
             midPoint.z = ((firstObject.transform.position.z + secondObject.transform.position.z) / 2);
-            mCamera.GetComponent<CameraControlScript>().target = midPoint;
+            mainCamera.GetComponent<CameraControlScript>().target = midPoint;
 
-            character.GetComponent<CharacterControlScript>().target = secondObject.transform.position;
-            character.GetComponent<CharacterControlScript>().faceTowardsTarget = true;
+            mainCharacter.GetComponent<CharacterControlScript>().target = secondObject.transform.position;
+            mainCharacter.GetComponent<CharacterControlScript>().faceTowardsTarget = true;     
         }
     }
 
 
-    public void buttonHovered(string tagName) {
+    public void ButtonHovered(string tagName) {
 
         if (choiceIsPicked) return;
+        if (!currentScript.allowCameraMovement) return;
+        if (!sceneTransistionFinished) return;
+
+       
+        mainCamera.GetComponent<CameraControlScript>().isTargeting = true;
 
         if (tagName == "firstChoice") {
-            mCamera.GetComponent<CameraControlScript>().newTarget();
-            firstObject = character;
-            secondObject = door;
-            character.GetComponent<CharacterControlScript>().isLooking = true;
+            mainCamera.GetComponent<CameraControlScript>().NewTarget();
+            firstObject = mainCharacter;
+            secondObject = currentScript.firstObject;
+            mainCharacter.GetComponent<CharacterControlScript>().isLooking = true;
         }
 
         if (tagName == "secondChoice") {
-            mCamera.GetComponent<CameraControlScript>().newTarget();
-            firstObject = character;
-            secondObject = table;
-            character.GetComponent<CharacterControlScript>().isLooking = true;
+            mainCamera.GetComponent<CameraControlScript>().NewTarget();
+            firstObject = mainCharacter;
+            secondObject = currentScript.secondObject;
+            mainCharacter.GetComponent<CharacterControlScript>().isLooking = true;
         }
 
         if (tagName == "thirdChoice") {
-            mCamera.GetComponent<CameraControlScript>().newTarget();
-            firstObject = character;
-            secondObject = character;
-            character.GetComponent<CharacterControlScript>().isLooking = false;
+            mainCamera.GetComponent<CameraControlScript>().NewTarget();
+            firstObject = mainCharacter;
+            secondObject = currentScript.thirdObject;
+            mainCharacter.GetComponent<CharacterControlScript>().isLooking = false;
         }
     }
 
-    public void buttonClicked(string tagName) {
+    public void ButtonClicked(string tagName) {
 
         if (choiceIsPicked) return;
+        if (!sceneTransistionFinished) return;
 
-        if (tagName == "firstChoice") {
-            character.GetComponent<CharacterControlScript>().startMoving = true;
+        if (tagName == currentScript.correctChoice) { 
+            SetNextScene(currentScript.nextScene);
         }
 
         choiceIsPicked = true;
+    }
+
+    public void ButtonAway() {
+
+        if (choiceIsPicked) return;
+        if (!sceneTransistionFinished) return;
+
+        mainCamera.GetComponent<CameraControlScript>().allowReturnPosition = currentScript.allowReturnPosition;
+        mainCamera.GetComponent<CameraControlScript>().NewTarget();
+        mainCamera.GetComponent<CameraControlScript>().isTargeting = false;
+        mainCharacter.GetComponent<CharacterControlScript>().isLooking = false;
+
+    }
+
+    public void GotToScene(GameObject scene) {      
+        currentScript = scene.GetComponent<SceneScript>();
+
+        firChoice.GetComponentInChildren<Text>().text = currentScript.firstChoiceText;
+        secChoice.GetComponentInChildren<Text>().text = currentScript.secondChoiceText;
+        thdChoice.GetComponentInChildren<Text>().text = currentScript.thirdChoiceText;
+
+        firstObject = currentScript.firstObject;
+        secondObject = currentScript.secondObject;
+        thirdObject = currentScript.thirdObject;
+
+        mainCamera.GetComponent<CameraControlScript>().GoToNewPosition(currentScript.cameraLocation, 0.01f);
+        if (mainCamera.GetComponent<CameraControlScript>().ReachedTargetLocation(currentScript.cameraLocation)) {
+            sceneTransistionFinished = true;
+        }
+
+        timerCount = currentScript.timer;
+        isTimerSet = currentScript.setTimer;       
+    }
+
+    public void SetNextScene(GameObject next) {
+        currentScene = next;
+        mainCamera.GetComponent<CameraControlScript>().NewTarget();
+        sceneTransistionFinished = false;
         
     }
 
