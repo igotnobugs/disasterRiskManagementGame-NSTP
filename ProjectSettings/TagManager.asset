@@ -10,6 +10,8 @@ TagManager:
   - gameUI
   - timerText
   - scoreText
+  - dialogueText
+  - dialoguePanel
   layers:
   - Default
   - TransparentFX

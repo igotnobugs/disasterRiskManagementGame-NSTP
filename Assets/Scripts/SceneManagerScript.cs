@@ -10,6 +10,7 @@ public class SceneManagerScript : MonoBehaviour {
     public Canvas UI;
 
     public GameObject currentScene;
+    public GameObject initialCameraOrientation;
 
     public GameObject mainCharacter;
 
@@ -37,6 +38,9 @@ public class SceneManagerScript : MonoBehaviour {
 
     private bool isTimerSet = false;
 
+    //private Text dialogueText;
+    //private Panel dialoguePanel;
+
     // Start is called before the first frame update
     void Start() {
         UI = GameObject.FindGameObjectWithTag("gameUI").GetComponent<Canvas>();
@@ -51,6 +55,13 @@ public class SceneManagerScript : MonoBehaviour {
 
         scoreText = GameObject.FindGameObjectWithTag("scoreText").GetComponent<Text>();
 
+        //dialogueText = GameObject.FindGameObjectWithTag("dialogueText").GetComponent<Text>();
+        //dialoguePanel = GameObject.FindGameObjectWithTag("dialoguePanel");
+
+        //dialoguePanel.setEnable = false;
+
+        mainCamera.transform.position = initialCameraOrientation.transform.position;
+        mainCamera.transform.rotation = initialCameraOrientation.transform.rotation;
         //First scene to do, is the selected current Scene      
         //GotToScene(currentScene);
     }

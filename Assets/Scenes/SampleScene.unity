@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.42343688, g: 0.4545192, b: 0.47762513, a: 1}
+  m_IndirectSpecularColor: {r: 0.42343658, g: 0.45451945, b: 0.47762477, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2424,6 +2424,83 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 926115937}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &985666616
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 985666617}
+  - component: {fileID: 985666619}
+  - component: {fileID: 985666618}
+  m_Layer: 5
+  m_Name: dialogueText
+  m_TagString: dialogueText
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &985666617
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985666616}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1496820414}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -1.9299927, y: -1.8749924}
+  m_SizeDelta: {x: -3.87, y: 3.75}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &985666618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985666616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: LOREM IMPSUM LOREM IMPSUMLOREM IMPSUM
+--- !u!222 &985666619
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985666616}
+  m_CullTransparentMesh: 0
 --- !u!1001 &987971392
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3302,7 +3379,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4639500602589158, guid: f35bd34b33d70144ca22184a194ae6a4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.085
+      value: 1.187
       objectReference: {fileID: 0}
     - target: {fileID: 4639500602589158, guid: f35bd34b33d70144ca22184a194ae6a4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4455,7 +4532,7 @@ GameObject:
   - component: {fileID: 1496820415}
   m_Layer: 5
   m_Name: dialoguePanel
-  m_TagString: Untagged
+  m_TagString: dialoguePanel
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4470,7 +4547,8 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 985666617}
   m_Father: {fileID: 323462049}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5605,6 +5683,7 @@ MonoBehaviour:
   startTimerValue: 30
   UI: {fileID: 323462048}
   currentScene: {fileID: 1941653585}
+  initialCameraOrientation: {fileID: 1029602703}
   mainCharacter: {fileID: 502209283}
   scored: 0
 --- !u!1001 &1941653584
@@ -6366,17 +6445,17 @@ PrefabInstance:
     - target: {fileID: 2795825889878825932, guid: 296cac4c5c493cf439d7df05a91ce414,
         type: 3}
       propertyPath: firstChoiceText
-      value: Go To Door
+      value: Run Directly Outside
       objectReference: {fileID: 0}
     - target: {fileID: 2795825889878825932, guid: 296cac4c5c493cf439d7df05a91ce414,
         type: 3}
       propertyPath: secondChoiceText
-      value: Hide Under Table
+      value: Duck Cover and Hold
       objectReference: {fileID: 0}
     - target: {fileID: 2795825889878825932, guid: 296cac4c5c493cf439d7df05a91ce414,
         type: 3}
       propertyPath: thirdChoiceText
-      value: Stay Put
+      value: Panic
       objectReference: {fileID: 0}
     - target: {fileID: 2795825889878825932, guid: 296cac4c5c493cf439d7df05a91ce414,
         type: 3}
