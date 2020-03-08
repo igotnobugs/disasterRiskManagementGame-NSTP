@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class SceneManagerScript : MonoBehaviour {
 
+    //View MainMenu First
+
     public Camera mainCamera;
     public float startTimerValue;
     public Canvas UI;
@@ -14,6 +16,8 @@ public class SceneManagerScript : MonoBehaviour {
 
     public GameObject mainCharacter;
 
+    public bool inMainMenu;
+
     private Button firChoice;
     private Button secChoice;
     private Button thdChoice;
@@ -22,9 +26,6 @@ public class SceneManagerScript : MonoBehaviour {
     private GameObject secondObject;
     private GameObject thirdObject;
 
-    private Text timer;
-    private Text firText;
-    private float timerCount; 
     private Vector3 midPoint = new Vector3();
 
     private bool choiceIsPicked = false;
@@ -38,8 +39,11 @@ public class SceneManagerScript : MonoBehaviour {
 
     private bool isTimerSet = false;
 
-    //private Text dialogueText;
-    //private Panel dialoguePanel;
+    private MainMenuScript mainMenuPanel;
+    private TimerScoreControlScript timerScorePanel;
+    private ChoicesControlScript choicesControlPanel;
+    private TimerControlScript timer;
+    private GameObject roof;
 
     // Start is called before the first frame update
     void Start() {
@@ -49,44 +53,54 @@ public class SceneManagerScript : MonoBehaviour {
         secChoice = GameObject.FindGameObjectWithTag("secondChoice").GetComponent<Button>();
         thdChoice = GameObject.FindGameObjectWithTag("thirdChoice").GetComponent<Button>();
 
-        timer = GameObject.FindGameObjectWithTag("timerText").GetComponent<Text>();
-        //timerCount = startTimerValue;
-        //timer.text = timerCount.ToString("f2");
-
-        scoreText = GameObject.FindGameObjectWithTag("scoreText").GetComponent<Text>();
-
-        //dialogueText = GameObject.FindGameObjectWithTag("dialogueText").GetComponent<Text>();
-        //dialoguePanel = GameObject.FindGameObjectWithTag("dialoguePanel");
-
-        //dialoguePanel.setEnable = false;
+        roof = GameObject.Find("roof");
 
         mainCamera.transform.position = initialCameraOrientation.transform.position;
         mainCamera.transform.rotation = initialCameraOrientation.transform.rotation;
-        //First scene to do, is the selected current Scene      
-        //GotToScene(currentScene);
+
+        mainMenuPanel = UI.GetComponentInChildren<MainMenuScript>();
+        timerScorePanel = UI.GetComponentInChildren<TimerScoreControlScript>();
+        timer = UI.GetComponentInChildren<TimerControlScript>();
+        choicesControlPanel = UI.GetComponentInChildren<ChoicesControlScript>();
     }
 
     // Update is called once per frame
     void Update() {
-        //Timer Countdown
-        if (isTimerSet) {
-            if (!choiceIsPicked) timerCount -= 1 * Time.deltaTime;
-            else {
-                if (!scored) {
-                    score += Mathf.Round(timerCount * 10);
-                    scored = true;
-                }
-            }
-        }
-        //Scoring
-        scoreText.text = score.ToString();
-        timer.text = timerCount.ToString("f2");
+        mainCamera.transform.LookAt(mainCamera.ScreenToWorldPoint(Input.mousePosition));
 
         if (!sceneTransistionFinished) {
             GotToScene(currentScene);
             choiceIsPicked = false;
+        } else {
+            if (!currentScript.isMainMenu) {
+                mainMenuPanel.Hide();
+                timerScorePanel.Show();
+                choicesControlPanel.Show();
+                timer.ShowTimer();
+                timer.StartTimer(currentScript.timer);
+            }
+            else {
+                mainMenuPanel.Show();
+                timerScorePanel.Hide();
+                choicesControlPanel.Hide();
+                //Hide Roof
+                roof.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+            }
         }
-        
+
+        if (!currentScript.isMainMenu) {
+            Color currentColor = roof.GetComponent<MeshRenderer>().material.color;
+            if (currentColor.a != 0) {
+                roof.GetComponent<MeshRenderer>().material.color
+                    = new Color(currentColor.a, currentColor.g, currentColor.b, currentColor.a - 0.5f * Time.deltaTime);
+                if (currentColor.a < 0) {
+                    roof.GetComponent<MeshRenderer>().material.color
+                    = new Color(currentColor.a, currentColor.g, currentColor.b, 0);
+                }
+            }
+            mainMenuPanel.Hide();
+        } 
+
 
         if (currentScript.allowCameraMovement) {
             //Get midpoint of the two objects, send it to Camera as target
@@ -159,9 +173,9 @@ public class SceneManagerScript : MonoBehaviour {
     public void GotToScene(GameObject scene) {      
         currentScript = scene.GetComponent<SceneScript>();
 
-        firChoice.GetComponentInChildren<Text>().text = currentScript.firstChoiceText;
-        secChoice.GetComponentInChildren<Text>().text = currentScript.secondChoiceText;
-        thdChoice.GetComponentInChildren<Text>().text = currentScript.thirdChoiceText;
+        firChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = currentScript.firstChoiceText;
+        secChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = currentScript.secondChoiceText;
+        thdChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = currentScript.thirdChoiceText;
 
         firstObject = currentScript.firstObject;
         secondObject = currentScript.secondObject;
@@ -172,7 +186,7 @@ public class SceneManagerScript : MonoBehaviour {
             sceneTransistionFinished = true;
         }
 
-        timerCount = currentScript.timer;
+        //timerCount = currentScript.timer;
         isTimerSet = currentScript.setTimer;       
     }
 
@@ -187,6 +201,17 @@ public class SceneManagerScript : MonoBehaviour {
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(midPoint, 1);
     }
+
+    public void QuitApp() {
+    #if UNITY_STANDALONE
+        Application.Quit();
+    #endif
+
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+    #endif
+    }
+
 }
 
 

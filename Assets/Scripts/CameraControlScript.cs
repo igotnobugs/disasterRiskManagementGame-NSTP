@@ -49,15 +49,18 @@ public class CameraControlScript : MonoBehaviour
         mt += time * Time.deltaTime;
         if (transform.position != newPosition.transform.position) {
             transform.position = Vector3.Lerp(transform.position, newPosition.transform.position, mt);
-        } else {
-            defaultPosition = newPosition.transform.position;
+        //} else {
+        //    defaultPosition = newPosition.transform.position;
         }
 
         if (transform.rotation != newPosition.transform.rotation) {
             transform.rotation = Quaternion.Slerp(transform.rotation, newPosition.transform.rotation, mt);
-        } else {
-            defaultRotation = newPosition.transform.rotation;
+        //} else {
+        //    defaultRotation = newPosition.transform.rotation;
         }
+
+        defaultPosition = newPosition.transform.position;
+        defaultRotation = newPosition.transform.rotation;
     }
 
     public void NewTarget() {

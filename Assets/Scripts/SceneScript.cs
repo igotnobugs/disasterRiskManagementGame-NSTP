@@ -22,9 +22,11 @@ public class SceneScript : MonoBehaviour
     public bool setTimer;
     public float timer;
 
-    public GameObject nextScene;
+    public GameObject nextScene = null;
 
     public bool allowReturnPosition = false;
+
+    public bool isMainMenu = false;
 
     // Start is called before the first frame update
     void Start()
