@@ -23,7 +23,7 @@ namespace UnityStandardAssets.CinematicEffects
         SerializedProperty _sampleCount;
         SerializedProperty _frameBlending;
 
-        [SerializeField] Texture2D _blendingIcon;
+        [SerializeField] Texture2D _blendingIcon = null;
 
         static GUIContent _textStrength = new GUIContent("Strength");
 

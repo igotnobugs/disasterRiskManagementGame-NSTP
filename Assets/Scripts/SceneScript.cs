@@ -6,7 +6,7 @@ public class SceneScript : MonoBehaviour
 {
     //For the current Scene
     public GameObject cameraLocation;
-
+    public string questionText;
     public string firstChoiceText;
     public string secondChoiceText;
     public string thirdChoiceText;

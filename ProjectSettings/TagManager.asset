@@ -22,10 +22,10 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - 
-  - 
-  - 
-  - 
+  - Character
+  - Roof
+  - Ground
+  - Wall
   - 
   - 
   - 

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Animations;
+using UnityEngine.AI;
 
 public class CharacterControlScript : MonoBehaviour
 {
@@ -12,7 +12,8 @@ public class CharacterControlScript : MonoBehaviour
 
     private Animator gAnim;
 
-    private float t = 0.0f;
+    public NavMeshAgent agent;
+    public Vector3 dest;
 
     // Start is called before the first frame update
     void Start()
@@ -34,11 +35,14 @@ public class CharacterControlScript : MonoBehaviour
 
 
         if (startMoving) {
-            transform.position = new Vector3(Mathf.Lerp(transform.position.x, target.x, t)
-                , transform.position.y
-                , Mathf.Lerp(transform.position.z, target.z, t));
 
-            t += 0.5f * Time.deltaTime;
+            agent.SetDestination(dest);
+
         }
+    }
+
+    public void MoveToPosition(Vector3 destination) {
+        startMoving = true;
+        dest = destination;
     }
 }

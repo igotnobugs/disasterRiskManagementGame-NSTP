@@ -149,7 +149,7 @@ namespace UnityStandardAssets.CinematicEffects
             get { return _quadMesh; }
         }
 
-        [SerializeField] Mesh _quadMesh;
+        [SerializeField] Mesh _quadMesh = null;
 
         int _OcclusionTexture;
         int _Intensity;

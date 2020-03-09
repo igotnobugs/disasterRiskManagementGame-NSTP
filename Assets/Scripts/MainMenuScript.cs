@@ -1,35 +1,65 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Platinio.TweenEngine;
+using Platinio.UI;
 
 public class MainMenuScript : MonoBehaviour
 {
-    private bool showPanel = false;
+    [SerializeField] private Vector2 startPosition = Vector2.zero;
+    [SerializeField] private Vector2 desirePosition = Vector2.zero;
+    [SerializeField] private RectTransform canvas = null;
+    [SerializeField] private float time = 0.5f;
+    [SerializeField] private Ease enterEase = Ease.EaseInOutExpo;
+    [SerializeField] private Ease exitEase = Ease.EaseInOutExpo;
+
+    private bool isVisible = false;
+    private RectTransform thisRect = null;
 
     // Start is called before the first frame update
-    void Start() {
-        transform.position = new Vector3(400, -45, 0);
+    void Start()
+    {
+        thisRect = GetComponent<RectTransform>();
+        thisRect.anchoredPosition = thisRect.FromAbsolutePositionToAnchoredPosition(startPosition, canvas);
+        Hide();
     }
 
     // Update is called once per frame
-    void Update() {
-        if (!showPanel) {
-            transform.Move(new Vector3(400, -45, 0), 0.3f);
-            //
-        }
-        else {
-            transform.Move(new Vector3(400, 64, 0), 0.3f);
-        }
+    void Update()
+    {
+        
     }
 
-    public void Show() { 
-        if (!showPanel)
-            showPanel = true;
+
+    public void StartGame() {
+        Hide();
+    }
+
+    public void QuitGame() {
+#if UNITY_STANDALONE
+        Application.Quit();
+#endif
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+    }
+
+    public void Show() {
+        if (isVisible)
+            return;
+
+        thisRect.MoveUI(desirePosition, canvas, time).SetEase(enterEase).SetOnComplete(delegate {
+            isVisible = true;
+        });
+
     }
 
     public void Hide() {
-        if (showPanel)
-            showPanel = false;
+        if (!isVisible)
+            return;
+
+        thisRect.MoveUI(startPosition, canvas, time).SetEase(exitEase).SetOnComplete(delegate {
+            isVisible = false;
+        });
     }
 }

@@ -13,7 +13,7 @@ public class CameraControlScript : MonoBehaviour
     private float t = 0.0f;
     private Vector3 defaultPosition;
     private Quaternion defaultRotation;
-    private bool doRotation = true;
+    //private bool doRotation = true;
 
     public bool allowReturnPosition = false;
     //need someway to reset this
@@ -31,7 +31,7 @@ public class CameraControlScript : MonoBehaviour
     {
         if (isTargeting) {
             transform.position = new Vector3(Mathf.Lerp(transform.position.x, target.x + offset.x, t)
-                    , offset.y
+                    , target.y + offset.y
                     , Mathf.Lerp(transform.position.z, target.z + offset.z, t));
             t += 0.5f * Time.deltaTime;           
         } else {
@@ -49,14 +49,10 @@ public class CameraControlScript : MonoBehaviour
         mt += time * Time.deltaTime;
         if (transform.position != newPosition.transform.position) {
             transform.position = Vector3.Lerp(transform.position, newPosition.transform.position, mt);
-        //} else {
-        //    defaultPosition = newPosition.transform.position;
         }
 
         if (transform.rotation != newPosition.transform.rotation) {
             transform.rotation = Quaternion.Slerp(transform.rotation, newPosition.transform.rotation, mt);
-        //} else {
-        //    defaultRotation = newPosition.transform.rotation;
         }
 
         defaultPosition = newPosition.transform.position;
@@ -69,6 +65,12 @@ public class CameraControlScript : MonoBehaviour
     }
 
     public bool ReachedTargetLocation(GameObject location) {
-        return this.transform.position == location.transform.position;
+        return transform.position == location.transform.position;
     }
+
+    public void SetNewPositionAsDefault() {
+        defaultPosition = transform.position;
+        defaultRotation = transform.rotation;
+    }
+
 }
