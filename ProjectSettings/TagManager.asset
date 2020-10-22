@@ -12,6 +12,7 @@ TagManager:
   - scoreText
   - dialogueText
   - dialoguePanel
+  - totalScore
   layers:
   - Default
   - TransparentFX

@@ -1,26 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Platinio.UI;
 
 public class TimerScoreControlScript : MonoBehaviour
 {
-    [SerializeField] private Vector2 startPosition = Vector2.zero;
-    [SerializeField] private Vector2 desirePosition = Vector2.zero;
-    [SerializeField] private RectTransform canvas = null;
-    [SerializeField] private float time = 0.5f;
-    [SerializeField] private Ease enterEase = Ease.EaseInOutExpo;
-    [SerializeField] private Ease exitEase = Ease.EaseInOutExpo;
-
-    public bool isVisible = false;
-    private RectTransform thisRect = null;
+    private int scoreNum;
+    private TMPro.TextMeshProUGUI scoreText;
 
     // Start is called before the first frame update
     void Start()
     {
-        thisRect = GetComponent<RectTransform>();
-        thisRect.anchoredPosition = thisRect.FromAbsolutePositionToAnchoredPosition(startPosition, canvas);
-        Hide();
+        scoreText = GetComponentInChildren<TMPro.TextMeshProUGUI>();
     }
 
     // Update is called once per frame
@@ -29,22 +19,13 @@ public class TimerScoreControlScript : MonoBehaviour
 
     }
 
-    public void Show() {
-        if (isVisible)
-            return;
 
-        thisRect.MoveUI(desirePosition, canvas, time).SetEase(enterEase).SetOnComplete(delegate {
-            isVisible = true;
-        });
-
+    public void AddScore(int score) {
+        scoreNum += score;
+        scoreText.text = scoreNum.ToString();
     }
 
-    public void Hide() {
-        if (!isVisible)
-            return;
-
-        thisRect.MoveUI(startPosition, canvas, time).SetEase(exitEase).SetOnComplete(delegate {
-            isVisible = false;
-        });
+    public int GetScore() {
+        return scoreNum;
     }
 }

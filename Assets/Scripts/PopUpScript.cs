@@ -42,4 +42,8 @@ public class PopUpScript : MonoBehaviour
             isVisible = false;
         });
     }
+
+    public bool GetVisibility() {
+        return isVisible;
+    }
 }

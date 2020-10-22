@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68e4211c4c83d054991bfc670efc71c4, type: 3}
+  m_Name: Scene6
+  m_EditorClassIdentifier: 
+  isVictoryScene: 0
+  cameraLocation: {x: 15.6, y: 22.64, z: -8.16}
+  cameraRotation: {x: 57.05, y: 0, z: 0}
+  question: The shaking has already stopped for a while. What do you do?
+  choices:
+  - Go home
+  - Gather your belongings
+  - Be calm and wait
+  correctChoice: thirdChoice
+  firstObjectPosition: {x: 18.17, y: 0.3200015, z: 11.3}
+  secondObjectPosition: {x: 18.17, y: 0.3200015, z: 11.3}
+  thirdObjectPosition: {x: 18.17, y: 0.3200015, z: 11.3}
+  newCharacterPosition: 0
+  characterPosition: {x: 0, y: 0, z: 0}
+  fadeOutRoof: 0
+  characterWillMove: 0
+  characterWillLook: 0
+  characterWillWalk: 0
+  allowCameraMovement: 1
+  timer: 30
+  allowReturnPosition: 0
+  isMainMenu: 0
+  lookAtCharacter: 0
+  lookOffset: {x: 1, y: 1, z: 0}
+  positionOffset: {x: 1, y: 1, z: 2}
+  explanationText: "Wait for any confirmation that you can contact your family from
+    your teacher or anyone in charge. Arrange a meeting point with your family or
+    wait in school with your teacher until your family arrives. \r\n"
+  explanationTextAppearLeft: 1
+  lookAtCamera: 0

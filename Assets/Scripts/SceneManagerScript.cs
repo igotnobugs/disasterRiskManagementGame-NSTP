@@ -2,237 +2,350 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class SceneManagerScript : MonoBehaviour {
 
-    //View MainMenu First
+    public StoryProgressionScript[] scenes;
+    public int progression = 0;
+    private StoryProgressionScript cs; //current Sscript used
 
-    public Camera mainCamera;
+    //View MainMenu First
+    public Camera mCamera;
     public float startTimerValue;
     public Canvas UI;
 
-    public GameObject currentScene;
     public GameObject initialCameraOrientation;
+    public GameObject mCharacter;
+    private CharacterControlScript characterScript;
 
-    public GameObject mainCharacter;
+    public GameObject mainMenuPanel;
+    public GameObject explanationPanelRight;
+    public GameObject explanationPanelLeft;
+    public GameObject timerScorePanel;
+    public GameObject scorePanel;
+    public GameObject choicesControlPanel;
+    public GameObject gameOverPanel;
+    public GameObject victoryBeforePanel;
+    public GameObject victoryPanel;
 
-    public bool inMainMenu;
+    public GameObject extraSoundObject;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
 
     private GameObject gameQuestionText;
-
     private Button firChoice;
     private Button secChoice;
     private Button thdChoice;
-
-    private GameObject firstObject;
-    private GameObject secondObject;
-    private GameObject thirdObject;
-
-    private Vector3 midPoint = new Vector3();
-
-    private bool choiceIsPicked = false;
-
-    public bool scored = false;
-
-    private SceneScript currentScript;
-
-    private bool sceneTransistionFinished = false;
-
-    private bool isTimerSet = false;
-
-    private MainMenuScript mainMenuPanel;
-    private TimerScoreControlScript timerScorePanel;
-    private ChoicesControlScript choicesControlPanel;
-    private TimerControlScript timer;
-    private GameObject roof;
+    private Vector3 firstObject;
+    private Vector3 secondObject;
+    private Vector3 thirdObject;
 
     public int totalMistakes = 0;
+    public bool scored = false;
+
+    private bool choiceIsPicked = false;  
+    private bool sceneTransistionFinished = false;   
+    private bool IsScriptRead = false;
+    private bool correctChoicePicked = false;
+    private bool showMainMenu = true;
+
+    private TimerControlScript timer;
+    private GameObject roof;
+    private GameObject totalScore;
+    
 
     // Start is called before the first frame update
     void Start() {
         UI = GameObject.FindGameObjectWithTag("gameUI").GetComponent<Canvas>();
 
+        //mainMenuPanel = UI.GetComponentInChildren<MainMenuScript>();
+
+        gameQuestionText = GameObject.Find("questionChoice");
         firChoice = GameObject.FindGameObjectWithTag("firstChoice").GetComponent<Button>();
         secChoice = GameObject.FindGameObjectWithTag("secondChoice").GetComponent<Button>();
         thdChoice = GameObject.FindGameObjectWithTag("thirdChoice").GetComponent<Button>();
 
         roof = GameObject.Find("roof");
 
-        mainCamera.transform.position = initialCameraOrientation.transform.position;
-        mainCamera.transform.rotation = initialCameraOrientation.transform.rotation;
+        mCamera.transform.position = initialCameraOrientation.transform.position;
+        mCamera.transform.rotation = initialCameraOrientation.transform.rotation;
 
-        timerScorePanel = UI.GetComponentInChildren<TimerScoreControlScript>();
         timer = UI.GetComponentInChildren<TimerControlScript>();
-        choicesControlPanel = UI.GetComponentInChildren<ChoicesControlScript>();
-        mainMenuPanel = UI.GetComponentInChildren<MainMenuScript>();
+        totalScore = GameObject.FindGameObjectWithTag("totalScore");
+        characterScript = mCharacter.GetComponent<CharacterControlScript>();
 
-        gameQuestionText = GameObject.Find("questionChoice");
+        Application.targetFrameRate = -1;
     }
 
     // Update is called once per frame
     void Update() {
-       
-        //Camera is moving
-        if (!sceneTransistionFinished) {
-            GotToScene(currentScene);
-            choiceIsPicked = false;
 
-            if (!currentScript.isMainMenu) {
-                //mainMenuPanel.Hide();
-                Color currentColor = roof.GetComponent<MeshRenderer>().material.color;
+        //Read Scene
+        if (!IsScriptRead &&
+            characterScript.destinationReached) {
+            ReadScriptAndExecute(scenes[progression]);
+        }
 
-                if (currentColor.a != 0) {
-                    roof.GetComponent<MeshRenderer>().material.color
-                        = new Color(currentColor.a, currentColor.g, currentColor.b, currentColor.a - 0.5f * Time.deltaTime);
-                    if (currentColor.a < 0) {
-                        roof.GetComponent<MeshRenderer>().material.color
-                        = new Color(currentColor.a, currentColor.g, currentColor.b, 0);
+        //For Victory Scene End, show Victory Panel
+        if (cs.isVictoryScene) {
+            if (cs.isVictoryBefore) {
+                victoryBeforePanel.GetComponent<PopUpScript>().Show();
+            } else {
+                victoryBeforePanel.GetComponent<PopUpScript>().Hide();
+                totalScore.GetComponent<TMPro.TextMeshProUGUI>().text = scorePanel.GetComponent<TimerScoreControlScript>().GetScore().ToString();
+                victoryPanel.GetComponent<PopUpScript>().Show();
+            }
+        }
+
+        // Wait for camera transisition to be finished
+        if (!cs.isVictoryScene && 
+            cs.allowCameraMovement &&
+            sceneTransistionFinished && 
+            totalMistakes < 3) {
+
+            mCharacter.GetComponent<CharacterControlScript>().target = secondObject;
+            mCharacter.GetComponent<CharacterControlScript>().faceTowardsTarget = true;
+
+            if (!correctChoicePicked) {
+                if (!cs.isMainMenu) {
+                    timer.StartTimer();
+                    timerScorePanel.GetComponent<PopUpScript>().Show();
+                    choicesControlPanel.GetComponent<PopUpScript>().Show();
+                }
+                else {
+                    if (showMainMenu) {
+                        mainMenuPanel.GetComponent<PopUpScript>().Show();
+                        timerScorePanel.GetComponent<PopUpScript>().Hide();
+                        choicesControlPanel.GetComponent<PopUpScript>().Hide();
                     }
                 }
             }
-
-        } else {
-
-            if (!currentScript.isMainMenu) {
-                timerScorePanel.Show();
-                choicesControlPanel.Show();
-                timer.StartTimer(currentScript.timer);
-            }
-            else {
-                mainMenuPanel.Show();
-                timerScorePanel.Hide();
-                choicesControlPanel.Hide();
-
-                //Hide Roof
-                roof.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            }
-
-            if (currentScript.allowCameraMovement) {
-                //Get midpoint of the two objects, send it to Camera as target
-                midPoint.x = (firstObject.transform.position.x + secondObject.transform.position.x) / 2;
-                midPoint.y = (firstObject.transform.position.y + secondObject.transform.position.y) / 2; ;
-                midPoint.z = ((firstObject.transform.position.z + secondObject.transform.position.z) / 2);
-                mainCamera.GetComponent<CameraControlScript>().target = midPoint;
-
-                mainCharacter.GetComponent<CharacterControlScript>().target = secondObject.transform.position;
-                mainCharacter.GetComponent<CharacterControlScript>().faceTowardsTarget = true;
-            }
-
         }
+
+        //After choices, character will move towards it
+        //after it reached, move camera towards it and show the reason
+        //Player has to click ok, to advance to next scene
+        if (!cs.isMainMenu && 
+            correctChoicePicked &&
+            characterScript.destinationReached) {
+            characterScript.target = mCamera.transform.position;
+            mCamera.GetComponent<CameraControlScript>().MoveAndLook(mCharacter, cs.lookOffset, cs.positionOffset);
+            mCharacter.GetComponent<CharacterControlScript>().faceTowardsTarget = true;
+            timerScorePanel.GetComponent<PopUpScript>().Hide();
+            choicesControlPanel.GetComponent<PopUpScript>().Hide();
+            roof.GetComponent<VisualEffectScript>().FadeIn();
+
+            if (cs.explanationTextAppearLeft) {
+                explanationPanelLeft.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = cs.explanationText;
+                explanationPanelLeft.GetComponent<PopUpScript>().Show();
+            } else {
+                explanationPanelRight.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = cs.explanationText;
+                explanationPanelRight.GetComponent<PopUpScript>().Show();
+            }
+        }
+
+        //Game Over Panel Show
+        if (totalMistakes >= 3) {
+            timer.PauseTimer();
+            gameOverPanel.GetComponent<PopUpScript>().Show();
+            timerScorePanel.GetComponent<PopUpScript>().Hide();
+            choicesControlPanel.GetComponent<PopUpScript>().Hide();
+        }
+
+
     }
 
-
+    //When a choice button is hovered
     public void ButtonHovered(string tagName) {
 
         if (choiceIsPicked) return;
-        if (!currentScript.allowCameraMovement) return;
+        if (!cs.allowCameraMovement) return;
         if (!sceneTransistionFinished) return;
 
-       
-        mainCamera.GetComponent<CameraControlScript>().isTargeting = true;
+        mCharacter.GetComponent<CharacterControlScript>().isLooking = cs.characterWillLook;
+        //firstObject = mCharacter.transform.position;
 
         if (tagName == "firstChoice") {
-            mainCamera.GetComponent<CameraControlScript>().NewTarget();
-            firstObject = mainCharacter;
-            secondObject = currentScript.firstObject;
-            mainCharacter.GetComponent<CharacterControlScript>().isLooking = true;
+            secondObject = cs.firstObjectPosition;
         }
 
         if (tagName == "secondChoice") {
-            mainCamera.GetComponent<CameraControlScript>().NewTarget();
-            firstObject = mainCharacter;
-            secondObject = currentScript.secondObject;
-            mainCharacter.GetComponent<CharacterControlScript>().isLooking = true;
+            secondObject = cs.secondObjectPosition;
         }
 
         if (tagName == "thirdChoice") {
-            mainCamera.GetComponent<CameraControlScript>().NewTarget();
-            firstObject = mainCharacter;
-            secondObject = currentScript.thirdObject;
-            mainCharacter.GetComponent<CharacterControlScript>().isLooking = false;
+            secondObject = cs.thirdObjectPosition;
         }
+
+        mCamera.GetComponent<CameraControlScript>().TargetMidPoint(mCharacter, secondObject);
     }
 
-    public void ButtonClicked(string tagName) {
+    //When a choice button is hovered away
+    public void ButtonAway() {
+        if (choiceIsPicked) return;
+        if (correctChoicePicked) return;
+        if (!sceneTransistionFinished) return;
 
+        if (cs.allowReturnPosition)
+            mCamera.GetComponent<CameraControlScript>().ReturnToDefaultPosition();
+
+        mCharacter.GetComponent<CharacterControlScript>().isLooking = false;
+
+    }
+
+    //When a choice button is clicked
+    public void ButtonClicked(string tagName) {
         if (choiceIsPicked) return;
         if (!sceneTransistionFinished) return;
 
-        if (tagName == currentScript.correctChoice) {           
-            SetNextScene(currentScript.nextScene);
+        if (tagName == cs.correctChoice) {
+            correctChoicePicked = true;
+            choicesControlPanel.GetComponent<PopUpScript>().Hide();
+            timer.PauseTimer();
+
+            characterScript.isWalking = cs.characterWillWalk;
+            characterScript.isRunning = !cs.characterWillWalk;
+
+            //Camera will follow the MidPoint of two objects
+            mCamera.GetComponent<CameraControlScript>().TargetMidPointUpdate(mCharacter, cs.secondObjectPosition);
+
+            int timeLeft = timer.GetFloatTimerToInt(2);
+            scorePanel.GetComponent<TimerScoreControlScript>().AddScore(timeLeft);
+
+            extraSoundObject.GetComponent<AudioSource>().clip = correctSound;
+            
+            if (!cs.characterWillMove) {
+                characterScript.isLooking = false;
+                return;
+            }
+
+            if (tagName == "firstChoice") {               
+                characterScript.MoveToPosition(cs.firstObjectPosition);
+            }
+
+            if (tagName == "secondChoice") {
+                characterScript.MoveToPosition(cs.secondObjectPosition);
+            }
+
+            if (tagName == "thirdChoice") {
+                characterScript.MoveToPosition(cs.thirdObjectPosition);
+            }
 
         } else {
-            if (!inMainMenu) {
-                totalMistakes += 1;
-            }
+            extraSoundObject.GetComponent<AudioSource>().clip = wrongSound;
+            totalMistakes += 1;
         }
-
-        choiceIsPicked = true;
+        extraSoundObject.GetComponent<AudioSource>().Play();
     }
 
-    public void ButtonAway() {
-
+    //When the start button in main menu is clicked
+    public void StartGame() {
         if (choiceIsPicked) return;
         if (!sceneTransistionFinished) return;
+        correctChoicePicked = true;
+        showMainMenu = false;
 
-        mainCamera.GetComponent<CameraControlScript>().allowReturnPosition = currentScript.allowReturnPosition;
-        mainCamera.GetComponent<CameraControlScript>().NewTarget();
-        mainCamera.GetComponent<CameraControlScript>().isTargeting = false;
-        mainCharacter.GetComponent<CharacterControlScript>().isLooking = false;
+        mainMenuPanel.GetComponent<PopUpScript>().Hide();
+        this.GetComponent<AudioSource>().volume /= 2;
 
+        progression += 1;
+        IsScriptRead = false;
     }
 
-    public void GotToScene(GameObject scene) {      
-        currentScript = scene.GetComponent<SceneScript>();
+    //When the explanation button is clicked
+    public void ButtonExplanationNext() {
+        explanationPanelLeft.GetComponent<PopUpScript>().Hide();
+        explanationPanelRight.GetComponent<PopUpScript>().Hide();
+        progression += 1;
+        IsScriptRead = false;
+        ReadScriptAndExecute(scenes[progression]);
+    }
 
-        firChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = currentScript.firstChoiceText;
-        secChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = currentScript.secondChoiceText;
-        thdChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = currentScript.thirdChoiceText;
+    private void ReadScriptAndExecute(StoryProgressionScript theScript) {
+        cs = theScript;
+        sceneTransistionFinished = false;
+        choiceIsPicked = false;
+        correctChoicePicked = false;
 
-        firstObject = currentScript.firstObject;
-        secondObject = currentScript.secondObject;
-        thirdObject = currentScript.thirdObject;
+        if (cs.isVictoryScene) {
+            sceneTransistionFinished = true;
+            IsScriptRead = true;
+            return;
+        }
 
-        gameQuestionText.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = currentScript.questionText;
+        //St up question text
+        gameQuestionText.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = cs.question;
 
+        //Set up Choices
+        firChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = cs.choices[0];
+        secChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = cs.choices[1];
+        thdChoice.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = cs.choices[2];
+
+        //Set up object positions
+        firstObject = cs.firstObjectPosition;
+        secondObject = cs.secondObjectPosition;
+        thirdObject = cs.thirdObjectPosition;
+
+        //Move the camera
         Hashtable ht = new Hashtable {
-            { "position", currentScript.cameraLocation.transform.position },
+            { "position", cs.cameraLocation },
             { "time", 2.0f },
             { "oncompletetarget", gameObject },
             { "oncomplete", "OnTransistionComplete" }
         };
-        iTween.MoveTo(mainCamera.gameObject, ht);
+        iTween.MoveTo(mCamera.gameObject, ht);
 
         Hashtable htp = new Hashtable {
-            { "rotation", currentScript.cameraLocation.transform.rotation.eulerAngles },
+            { "rotation", cs.cameraRotation },
             { "time", 2.0f },
             { "oncompletetarget", gameObject },
             { "oncomplete", "OnTransistionComplete" }
         };
-        iTween.RotateTo(mainCamera.gameObject, htp);
+        iTween.RotateTo(mCamera.gameObject, htp);
 
-        //timerCount = currentScript.timer;
-        isTimerSet = currentScript.setTimer;       
-    }
+        //Hide Roof
+        if (!roof.GetComponent<VisualEffectScript>().isFadeOut && cs.fadeOutRoof)
+            roof.GetComponent<VisualEffectScript>().FadeOut();
 
-    public void SetNextScene(GameObject next) {
-        currentScene = next;
-        mainCamera.GetComponent<CameraControlScript>().NewTarget();
-        sceneTransistionFinished = false;
-        
-    }
+        timer.SetTimer(cs.timer);
+        timer.ResumeTimer();
 
-    void OnDrawGizmos() {
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(midPoint, 1);
+        //Move character if true
+        if (cs.newCharacterPosition) {
+            characterScript.isWalking = cs.characterWillWalk;
+            characterScript.isRunning = !cs.characterWillWalk;
+            characterScript.MoveToPosition(cs.characterPosition);
+        }
+
+        //Set script to be read
+        IsScriptRead = true;
     }
 
     private void OnTransistionComplete() {
         if (!sceneTransistionFinished) {
-            mainCamera.GetComponent<CameraControlScript>().SetNewPositionAsDefault();
+            mCamera.GetComponent<CameraControlScript>().SetNewPositionAsDefault();
             sceneTransistionFinished = true;
         }
     }
+
+    private bool IsReadyForNextScene() {
+        return sceneTransistionFinished;
+    }
+
+
+    public void ResetGame() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void QuitGame() {
+#if UNITY_STANDALONE
+        Application.Quit();
+#endif
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+    }
+
 }
-
-

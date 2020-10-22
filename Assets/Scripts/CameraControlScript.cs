@@ -7,17 +7,17 @@ public class CameraControlScript : MonoBehaviour
     public Vector3 offset;
     public Vector3 target;
 
-    public bool isTargeting;
-    public bool isMainMenu = true;
+    //public bool isTargeting;
 
-    private float t = 0.0f;
     private Vector3 defaultPosition;
     private Quaternion defaultRotation;
-    //private bool doRotation = true;
 
-    public bool allowReturnPosition = false;
-    //need someway to reset this
-    public float mt = 0.0f;
+    //public bool allowReturnPosition;
+
+    private bool constantUpdate = false;
+
+    private GameObject firstObjectUpdate;
+    private Vector3 secondObjectUpdate;
 
     // Start is called before the first frame update
     void Start()
@@ -29,43 +29,87 @@ public class CameraControlScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isTargeting) {
-            transform.position = new Vector3(Mathf.Lerp(transform.position.x, target.x + offset.x, t)
-                    , target.y + offset.y
-                    , Mathf.Lerp(transform.position.z, target.z + offset.z, t));
-            t += 0.5f * Time.deltaTime;           
-        } else {
-            if (allowReturnPosition) {
-                transform.position = new Vector3(Mathf.Lerp(transform.position.x, defaultPosition.x, t)
-                    , defaultPosition.y
-                    , Mathf.Lerp(transform.position.z, defaultPosition.z, t));
-                t += 0.5f * Time.deltaTime;
-            }
-        }
+        //When it follows two moving objects midpoint
+        if (constantUpdate) {
+            Vector3 midPoint;
+            midPoint.x = (firstObjectUpdate.transform.position.x + secondObjectUpdate.x) / 2;
+            midPoint.y = (firstObjectUpdate.transform.position.y + secondObjectUpdate.y) / 2;
+            midPoint.z = (firstObjectUpdate.transform.position.z + secondObjectUpdate.z) / 2;
 
+            Hashtable htz = new Hashtable {
+                { "x", midPoint.x + offset.x},
+                { "y", midPoint.y + offset.y},
+                { "z", midPoint.z + offset.z},
+                { "time", 0.1f }
+            };
+
+            iTween.MoveUpdate(gameObject, midPoint + offset, 1.0f);
+        }
     }
 
-    public void GoToNewPosition(GameObject newPosition, float time = 0) {
-        mt += time * Time.deltaTime;
-        if (transform.position != newPosition.transform.position) {
-            transform.position = Vector3.Lerp(transform.position, newPosition.transform.position, mt);
-        }
+    public void TargetMidPoint(Vector3 firstObject, Vector3 secondObject) {
+        if (constantUpdate) return;
+        Vector3 midPoint;
+        midPoint.x = (firstObject.x + secondObject.x) / 2;
+        midPoint.y = (firstObject.y + secondObject.y) / 2;
+        midPoint.z = (firstObject.z + secondObject.z) / 2;
 
-        if (transform.rotation != newPosition.transform.rotation) {
-            transform.rotation = Quaternion.Slerp(transform.rotation, newPosition.transform.rotation, mt);
-        }
-
-        defaultPosition = newPosition.transform.position;
-        defaultRotation = newPosition.transform.rotation;
+        Hashtable htz = new Hashtable {
+                { "x", midPoint.x + offset.x},
+                { "y", midPoint.y + offset.y},
+                { "z", midPoint.z + offset.z},
+                { "time", 2.0f }
+            };
+        iTween.MoveTo(gameObject, htz);
     }
 
-    public void NewTarget() {
-        t = 0;
-        mt = 0;
+    public void TargetMidPoint(GameObject firstObject, Vector3 secondObject) {
+        if (constantUpdate) return;
+        Vector3 midPoint;
+        midPoint.x = (firstObject.transform.position.x + secondObject.x) / 2;
+        midPoint.y = (firstObject.transform.position.y + secondObject.y) / 2;
+        midPoint.z = (firstObject.transform.position.z + secondObject.z) / 2;
+
+        Hashtable htz = new Hashtable {
+                { "x", midPoint.x + offset.x},
+                { "y", midPoint.y + offset.y},
+                { "z", midPoint.z + offset.z},
+                { "time", 2.0f }
+            };
+        iTween.MoveTo(gameObject, htz);
     }
 
-    public bool ReachedTargetLocation(GameObject location) {
-        return transform.position == location.transform.position;
+    public void TargetMidPointUpdate(GameObject firstObject, Vector3 secondObject) {
+        firstObjectUpdate = firstObject;
+        secondObjectUpdate = secondObject;
+        constantUpdate = true;
+    }
+
+    public void ReturnToDefaultPosition() {
+        constantUpdate = false;
+        Hashtable htx = new Hashtable {
+                    { "x", defaultPosition.x},
+                    { "y", defaultPosition.y},
+                    { "z", defaultPosition.z},
+                    { "time", 2.0f }
+                };
+        iTween.MoveTo(gameObject, htx);
+    }
+
+    public void MoveAndLook(Vector3 target, Vector3 targetOffset, Vector3 positionOffset) {
+        constantUpdate = false;
+        iTween.MoveUpdate(gameObject, target + positionOffset, 2.0f);
+        iTween.LookUpdate(gameObject, target + targetOffset, 2.0f);
+    }
+
+    public void MoveAndLook(GameObject target, Vector3 targetOffset, Vector3 positionOffset) {
+        constantUpdate = false;
+        iTween.MoveUpdate(gameObject, target.transform.position + positionOffset, 2.0f);
+        iTween.LookUpdate(gameObject, target.transform.position + targetOffset, 2.0f);
+    }
+
+    public void LookAtObject(Vector3 target) {
+        iTween.LookTo(gameObject, target, 1);
     }
 
     public void SetNewPositionAsDefault() {

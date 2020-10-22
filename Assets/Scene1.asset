@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68e4211c4c83d054991bfc670efc71c4, type: 3}
+  m_Name: Scene1
+  m_EditorClassIdentifier: 
+  isVictoryScene: 0
+  cameraLocation: {x: 0, y: 16.63, z: -8.155465}
+  cameraRotation: {x: 57.05, y: 0, z: 0}
+  question: The Building is shaking where will you go?
+  choices:
+  - Run directly outside
+  - Duck, Cover, Hold
+  - Panic
+  correctChoice: secondChoice
+  firstObjectPosition: {x: -6.539, y: 6.655349, z: 4.034534}
+  secondObjectPosition: {x: -6.55, y: 6.689345, z: -2.05}
+  thirdObjectPosition: {x: 4.85, y: 6.605346, z: -3.965466}
+  newCharacterPosition: 0
+  characterPosition: {x: 0, y: 0, z: 0}
+  fadeOutRoof: 1
+  characterWillMove: 1
+  characterWillLook: 1
+  characterWillWalk: 1
+  allowCameraMovement: 1
+  timer: 30
+  allowReturnPosition: 1
+  isMainMenu: 0
+  lookAtCharacter: 1
+  lookOffset: {x: 0, y: 1, z: 1}
+  positionOffset: {x: 2, y: 1, z: 1}
+  explanationText: 'During an earthquake, do not run. Falling objects pose a risk.
+    If you are inside, find something sturdy to hide under or go to a corner of a
+    wall. Do not go near windows and cover your head and neck. '
+  explanationTextAppearLeft: 0
+  lookAtCamera: 0

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68e4211c4c83d054991bfc670efc71c4, type: 3}
+  m_Name: Scene2
+  m_EditorClassIdentifier: 
+  isVictoryScene: 0
+  cameraLocation: {x: -4.73, y: 22.64, z: -8.155465}
+  cameraRotation: {x: 57.05, y: 0, z: 0}
+  question: You are at the top floor of your school. What will you do first?
+  choices:
+  - Take the elevator
+  - Go to the emergency exit
+  - Grab your things and run
+  correctChoice: secondChoice
+  firstObjectPosition: {x: -14.83, y: 6.692985, z: 13.13}
+  secondObjectPosition: {x: 7.15, y: 6.611754, z: 6.83}
+  thirdObjectPosition: {x: 5.881, y: 5.881, z: -2.811}
+  newCharacterPosition: 0
+  characterPosition: {x: 0, y: 0, z: 0}
+  fadeOutRoof: 1
+  characterWillMove: 1
+  characterWillLook: 1
+  characterWillWalk: 1
+  allowCameraMovement: 1
+  timer: 30
+  allowReturnPosition: 1
+  isMainMenu: 0
+  lookAtCharacter: 1
+  lookOffset: {x: -1, y: 1, z: 0}
+  positionOffset: {x: -2, y: 1, z: -2}
+  explanationText: 'Listen to your teacher or to any person who is in charge. If
+    you are given the go signal, leave all belongings and proceed to follow emergency
+    routes to emergency exits in a calm and orderly manner. Use stairs and never
+    elevators. '
+  explanationTextAppearLeft: 1
+  lookAtCamera: 0

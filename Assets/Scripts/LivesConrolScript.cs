@@ -14,6 +14,9 @@ public class LivesConrolScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        mistake1Icon.enabled = false;
+        mistake2Icon.enabled = false;
+        mistake3Icon.enabled = false;
     }
 
     // Update is called once per frame
